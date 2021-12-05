@@ -11,7 +11,7 @@ Redirects
 ---------
 
 cmd1 | cmd2
-  = pipe standard output of the command to standard input of the next command
+  = pipe standard output of cmd1 to standard input of cmd2
 
 cmd > file
   = redirect cmd standard output to file, create or overwrite
