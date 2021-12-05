@@ -1,6 +1,7 @@
 #!/bin/bash
 
-for i in (1..360); do
+counter=0
+while [ $counter -lt 300 ]; do
 	sleep 1
+	let counter=counter+1
 done
-
