@@ -1,5 +1,5 @@
-Linux operands
---------------
+Job Control
+-----------
 
 cmd1 ; cmd2
   = wait until command is complete, then continue
