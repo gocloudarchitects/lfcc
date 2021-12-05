@@ -1,0 +1,10 @@
+greeting () {
+  echo -n "What's your name? "
+  read input
+  echo "Hi, ${input}!"
+}
+
+declutter () {
+  grep -v "^[ ]*$|^[ ]*#" $1
+}
+

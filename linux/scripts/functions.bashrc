@@ -12,7 +12,7 @@ k () {
         kinit username
 }
 
-grip () {
-        grep -vE '^#|^$' $1
+nospace () {
+        grep -vE '^[ ]*#|^[ ]*$' $1
 }
 
