@@ -1,13 +1,13 @@
 Special Variables
 -----------------
 
-- $! - pid of last command sent to bg
 - $@ - all parameters
 - $# - the number of params
 - $? - exit status of last command
 - $$ - pid of shell
-- $0 - name of shell
 - $- - shell options
+- $! - pid of last command sent to bg
+- $(cmd) - return the results of the command
 
 Bash functions
 --------------
