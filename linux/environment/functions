@@ -4,11 +4,11 @@ greeting () {
   echo "Hi, ${input}!"
 }
 
-pingc () {
-  ping -C
-}
-
 declutter () {
   test $# -eq 1 && grep -vE '^[ ]*#|^[ ]*$' $1
   test $# -ne 1 && echo "Usage: declutter <file>"
+}
+
+pingc () {
+  ping -C
 }

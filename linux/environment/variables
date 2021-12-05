@@ -1,0 +1,3 @@
+var=yes
+var2=no
+export var3=maybe
