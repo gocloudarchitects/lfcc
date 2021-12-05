@@ -1,0 +1,8 @@
+# user defined settings and variables
+
+if [ -d ~/.bashrc.d ]; then
+    for file in `ls ~/.bashrc.d/*`
+        do
+                . $file
+        done
+fi
