@@ -1,7 +1,7 @@
 greeting () {
-  echo "What's your name? " -n
-  read input
-  echo "Hi, ${input}!"
+  echo -n "What's your name? "
+  read name
+  echo "Hi, ${name}!"
 }
 
 declutter () {
@@ -9,6 +9,3 @@ declutter () {
   test $# -ne 1 && echo "Usage: declutter <file>"
 }
 
-pingc () {
-  ping -C
-}
