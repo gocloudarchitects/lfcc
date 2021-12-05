@@ -1,0 +1,14 @@
+greeting () {
+  echo "What's your name? " -n
+  read input
+  echo "Hi, ${input}!"
+}
+
+pingc () {
+  ping -C
+}
+
+declutter () {
+  test $# -eq 1 && grep -vE '^[ ]*#|^[ ]*$' $1
+  test $# -ne 1 && echo "Usage: declutter <file>"
+}
