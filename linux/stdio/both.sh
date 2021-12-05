@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-echo maybe yes
-echo maybe no 1>&2
+echo stdout
+echo stderr 1>&2

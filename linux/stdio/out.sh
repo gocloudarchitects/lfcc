@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-echo yes
+echo stdout
 exit 0

@@ -42,3 +42,7 @@ Manipulating stdio
 
 2>&1 - send stderr to stdout
 
+Piping only stderr
+------------------
+
+cmd1 2>&1 > /dev/null | cmd2
