@@ -7,19 +7,6 @@ cmd1 ; cmd2
 cmd1 & cmd2
   = send command to background and continue immediately
 
-Redirects
----------
-
-cmd1 | cmd2
-  = pipe standard output of cmd1 to standard input of cmd2
-
-cmd > file
-  = redirect cmd standard output to file, create or overwrite
-
-cmd >> file
-  = redirect cmd standard output to file, create or append
-
-
 Logical operators
 -----------------
 cmd1 && cmd2
