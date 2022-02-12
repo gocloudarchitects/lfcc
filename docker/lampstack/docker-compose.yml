@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+   db:
+     build: ./mysql
+     volumes:
+       - db_data:/var/lib/mysql
+     environment:
+       MYSQL_ROOT_PASSWORD: root
+   php:
+    build: ./php
+    ports:
+      - 8000:80
+    restart: always
+    volumes:
+       - ./html:/var/www/html
+    depends_on:
+      - db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+volumes:
+    db_data:

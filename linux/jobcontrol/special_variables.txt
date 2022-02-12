@@ -1,0 +1,7 @@
+$! - pid of last command sent to bg
+$@ - all parameters
+$# - the number of params
+$? - exit status of last command
+$$ - pid of shell
+$0 - name of shell
+$- - shell options
