@@ -42,8 +42,8 @@ INSERT INTO `data` VALUES (4,'Each number in brackets is the `id` field, the uni
 INSERT INTO `data` VALUES (5,'Each associated message is text from the `message` field.');
 INSERT INTO `data` VALUES (6,'┌──────────────┐');
 INSERT INTO `data` VALUES (7,'│ mysql server │');
-INSERT INTO `data` VALUES (8,'│              │ (backend)');
-INSERT INTO `data` VALUES (9,'│   port 3306  │');
+INSERT INTO `data` VALUES (8,'│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ (backend)');
+INSERT INTO `data` VALUES (9,'│ &nbsp; port 3306&nbsp; │');
 INSERT INTO `data` VALUES (10,'└───────▲──────┘');
 INSERT INTO `data` VALUES (11,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│');
 INSERT INTO `data` VALUES (12,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│');
