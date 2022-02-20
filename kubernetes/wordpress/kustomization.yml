@@ -1,3 +1,7 @@
+secretGenerator:
+- name: mysql-pass
+  literals:
+  - password=secretpassword
 resources:
   - 01-db-service.yml
   - 02-db-pvc.yml
