@@ -7,5 +7,5 @@ resources:
   - 02-db-pvc.yml
   - 03-db-deployment.yml
   - 04-frontend-service.yml
-  - 05-frontend-deployment.yml
   - 05-frontend-pvc.yml
+  - 06-frontend-deployment.yml
