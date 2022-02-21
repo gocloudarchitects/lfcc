@@ -1,0 +1,17 @@
+#!/bin/bash
+# ensure you are a regular user, else quit
+if [ $(whoami) == "root" ]; then
+  echo "You must run this script as root"
+  exit 1
+fi
+
+source ~/venv/kolla/bin/activate
+
+# generate passwords, set admin password to `kolla`
+kolla-genpwd
+sed -i 's/^keystone_admin_password:.*$/keystone_admin_password: kolla/g' /etc/kolla/passwords.yml
+
+# install kolla (need to config globals.yml first)
+# kolla-ansible -i all-in-one bootstrap-servers
+# kolla-ansible -i all-in-one prechecks && kolla-ansible -i all-in-one deploy && kolla-ansible -i all-in-one post-deploy
+

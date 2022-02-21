@@ -1,0 +1,9 @@
+---
+kolla_base_distro: "ubuntu"
+kolla_internal_vip_address: "192.168.5.254"
+kolla_sysctl_conf_path: /etc/sysctl.d/50-kolla-ansible.conf
+network_interface: "enp0s8"
+neutron_external_interface: "dummy-provider"
+enable_neutron_provider_networks: "yes"
+enable_cinder: "yes"
+enable_cinder_backend_lvm: "yes"

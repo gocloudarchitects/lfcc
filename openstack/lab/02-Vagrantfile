@@ -1,0 +1,42 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# MINIMUM REQUIREMENTS
+# CPU: non listed
+# RAM: 8GB
+# HDD: 40GB
+# Network: 2 NICs (we will use a dummy interface for the neutron provider net)
+# (optional): additional HDD for Cinder volumes
+
+$createnic = <<-SCRIPT
+cat << EOF >  /etc/systemd/network/10-dummy-provider.netdev
+[NetDev]
+Name=dummy-provider
+Kind=dummy
+EOF
+systemctl restart systemd-networkd
+ip link set up dummy-provider
+SCRIPT
+
+
+Vagrant.configure("2") do |config|
+  # main VM definition
+  config.vm.box = "ubuntu/focal64"
+  config.vm.provision "shell", inline: "hostnamectl set-hostname stack-lab"
+  config.vm.network "public_network", ip: "192.168.5.2", bridge: "br-api"
+
+  # Creating a dummy interface instead of bridging the network to the outside
+  config.vm.provision "shell", inline: $createnic
+  # config.vm.network "public_network", auto_config: false, bridge: "br-provider"
+  
+  # additional disk for Cinder volumes
+  config.vm.disk :disk, name: "cinder", size: "20GB"
+  
+  # Virtualbox-specific parameters
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "8192"
+    vb.cpus    = "4"
+    vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+  end
+end
+
