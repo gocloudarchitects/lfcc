@@ -7,7 +7,7 @@ so if you encounter problems, please review the project documentation.
 
 # Configuration overview
 
-The document is in 3 sections:
+This document is divided in sections:
 
 1. Initialize the hypervisor
 2. Provisiom the lab vm
