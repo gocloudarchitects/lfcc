@@ -62,7 +62,24 @@ pvcreate /dev/sdc
 vgcreate cinder-volumes /dev/sdc
 
 
-cat << EOF > /etc/kolla/globals.yml
+
+cat << EOF > ~vagrant/setup.sh
+#!/bin/bash
+mkdir ~/venv
+python3 -m venv ~/venv/kolla
+source ~/venv/kolla/bin/activate
+pip install -U pip
+pip install 'ansible==5.*'
+pip install git+https://opendev.org/openstack/kolla-ansible@master || pip install git+https://github.com/openstack/kolla-ansible@master
+pip install python-openstackclient -c https://releases.openstack.org/constraints/upper/master || pip install git+https://github.com/openstack/python-openstackclient
+
+
+
+cp ~/venv/kolla/share/kolla-ansible/ansible/inventory/* .
+
+
+cp ~/venv/kolla/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
+cat << DONE > /etc/kolla/globals.yml
 ---
 kolla_base_distro: "ubuntu"
 kolla_internal_vip_address: "192.168.5.254"
@@ -72,19 +89,8 @@ neutron_external_interface: "dummy-provider"
 enable_cinder: "yes"
 enable_cinder_backend_lvm: "yes"
 enable_neutron_provider_networks: "yes"
-EOF
+DONE
 
-cat << EOF > ~vagrant/setup.sh
-#!/bin/bash
-mkdir ~/venv
-python3 -m venv ~/venv/kolla
-source ~/venv/kolla/bin/activate
-pip install -U pip
-pip install 'ansible==5.*'
-pip install git+https://opendev.org/openstack/kolla-ansible@master
-pip install python-openstackclient -c https://releases.openstack.org/constraints/upper/master
-
-cp ~/venv/kolla/share/kolla-ansible/ansible/inventory/* .
 kolla-genpwd
 sed -i 's/^keystone_admin_password:.*$/keystone_admin_password: kolla/g' /etc/kolla/passwords.yml
 
@@ -94,12 +100,19 @@ kolla-ansible -i all-in-one prechecks && kolla-ansible -i all-in-one deploy && k
 source /etc/kolla/admin-openrc.sh
 ~/venv/kolla/share/kolla-ansible/init-runonce
 
+openstack server create \
+    --image cirros \
+    --flavor m1.tiny \
+    --key-name mykey \
+    --network demo-net \
+    demo1
+
+
 sudo ip link set up dummy-provider
 sudo ip link set up br-ex
 sudo ip link set up br-int
 sudo ip link set up br-tun
-sudo ip add address 10.0.2.1/24 dev br-ex 
-
+sudo ip address add 10.0.2.1/24 dev br-ex 
 EOF
 
 chmod +x ~vagrant/setup.sh
