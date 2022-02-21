@@ -28,6 +28,6 @@ nmcli connection add type bridge ifname br-api con-name br-api ipv4.method manua
 nmcli connection add type dummy ifname dummy-api con-name dummy-api master br-api
 
 # OPTIONAL: commands to create provider bridge 
-# nmcli connection add type bridge ifname br-provider con-name br-provider ipv4.method manual ipv4.addresses 10.0.2.1/24
+# nmcli connection add type bridge ifname br-provider con-name br-provider ipv4.method manual ipv4.addresses 192.168.6.1/24
 # ncmli connection add type dummy ifname dummy-provider con-name dummy-provider master br-provider
 

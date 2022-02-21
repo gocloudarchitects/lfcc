@@ -98,6 +98,8 @@ kolla-ansible -i all-in-one bootstrap-servers
 kolla-ansible -i all-in-one prechecks && kolla-ansible -i all-in-one deploy && kolla-ansible -i all-in-one post-deploy
 
 source /etc/kolla/admin-openrc.sh
+
+sed 's/10.0.2/192.168.6/g' ~/venv/kolla/share/kolla-ansible/init-runonce -i
 ~/venv/kolla/share/kolla-ansible/init-runonce
 
 openstack server create \
@@ -112,7 +114,7 @@ sudo ip link set up dummy-provider
 sudo ip link set up br-ex
 sudo ip link set up br-int
 sudo ip link set up br-tun
-sudo ip address add 10.0.2.1/24 dev br-ex 
+sudo ip address add 192.168.6.1/24 dev br-ex 
 EOF
 
 chmod +x ~vagrant/setup.sh

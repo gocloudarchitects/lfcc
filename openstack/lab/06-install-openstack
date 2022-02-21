@@ -1,7 +1,7 @@
 #!/bin/bash
 # ensure you are a regular user, else quit
 if [ $(whoami) == "root" ]; then
-  echo "You must run this script as root"
+  echo "You must run this script as your regular user"
   exit 1
 fi
 
