@@ -1,6 +1,6 @@
 # Installing OpenStack All-In-One Lab with Kolla-Ansible
 
-These instructions are derived from the [Kolla-Ansible Quickstart Guide](https://docs.openstack.org/kolla-ansible/latest/user/quickstart.html).
+These instructions are derived from the [Kolla-Ansible Quickstart Guide](https://docs.openstack.org/kolla-ansible/xena/user/quickstart.html).
 
 There may be some minor changes in the install process with new releases,
 so if you encounter problems, please review the project documentation.
