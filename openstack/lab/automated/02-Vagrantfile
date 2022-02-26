@@ -47,6 +47,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install -y python3-dev libffi-dev gcc libssl-dev python3-venv net-tools bridge-utils
 
+# set up ansible config
 mkdir /etc/ansible -p
 cat << EOF > /etc/ansible/ansible.cfg
 [defaults]
@@ -55,12 +56,15 @@ pipelining=True
 forks=100
 EOF
 
+# create kolla config dir
 mkdir -p /etc/kolla
 chown vagrant:vagrant /etc/kolla
 
+# prepare driver for cinder lvm pool
 pvcreate /dev/sdc
 vgcreate cinder-volumes /dev/sdc
 
+# create setup script
 cat << EOF > ~vagrant/setup.sh
 #!/bin/bash
 mkdir ~/venv
@@ -98,30 +102,25 @@ sed -i 's/^keystone_admin_password:.*$/keystone_admin_password: kolla/g' /etc/ko
 kolla-ansible -i all-in-one bootstrap-servers
 kolla-ansible -i all-in-one prechecks && kolla-ansible -i all-in-one deploy && kolla-ansible -i all-in-one post-deploy
 
-source /etc/kolla/admin-openrc.sh
-
-sed 's/10.0.2/192.168.6/g' ~/venv/kolla/share/kolla-ansible/init-runonce -i
-~/venv/kolla/share/kolla-ansible/init-runonce
-
-openstack server create \
-    --image cirros \
-    --flavor m1.tiny \
-    --key-name mykey \
-    --network demo-net \
-    demo1
-
-
-sudo ip link set up dummy-provider
-sudo ip link set up br-ex
-sudo ip link set up br-int
-sudo ip link set up br-tun
-sudo ip address add 192.168.6.1/24 dev br-ex 
+# OPTIONAL SETUP
+#source /etc/kolla/admin-openrc.sh
+#sed 's/10.0.2/192.168.6/g' ~/venv/kolla/share/kolla-ansible/init-runonce -i
+#~/venv/kolla/share/kolla-ansible/init-runonce
+#bash -c 'sudo cat << NESTEDEOF > /etc/netplan/60-provider.yaml
+#network:
+#  version: 2
+#  renderer: networkd
+#  bridges:
+#    br-ex:
+#      addresses:
+#      - 192.168.6.1/24
+#NESTEDEOF'
+#sudo netplan apply
+#openstack server create --image cirros --flavor m1.tiny --key-name mykey --network demo-net demo1
 EOF
 
 chmod +x ~vagrant/setup.sh
 chown vagrant.vagrant ~vagrant/setup.sh
-sudo reboot
-su -c '/home/vagrant/setup.sh' vagrant
-
+sudo bash -c 'sleep 15; reboot' &
 SCRIPT
 
