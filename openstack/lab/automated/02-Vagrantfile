@@ -43,9 +43,9 @@ Vagrant.configure("2") do |config|
 end
 
 $script=<<-SCRIPT
-sudo apt update
-sudo apt upgrade -y
-sudo apt install -y python3-dev libffi-dev gcc libssl-dev python3-venv net-tools bridge-utils
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y python3-dev libffi-dev gcc libssl-dev python3-venv net-tools bridge-utils
 
 mkdir /etc/ansible -p
 cat << EOF > /etc/ansible/ansible.cfg

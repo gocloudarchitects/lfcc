@@ -11,7 +11,7 @@ elif [ $(whoami) != "root" ]; then
 fi
 
 # install necessary tools
-apt install net-tools bridge-utils -y
+apt-get install net-tools bridge-utils -y
 
 # optimize virtualized networks
 cat << EOF > /etc/sysctl.d/50-kvm-bridging.conf
