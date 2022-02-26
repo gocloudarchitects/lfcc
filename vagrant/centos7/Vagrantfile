@@ -2,7 +2,16 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
+  # main VM definition
   config.vm.box = "centos/7"
   config.vm.provision "shell",
     inline: "hostnamectl set-hostname centos-vm"
+
+  # Virtualbox-specific parameters
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "4096"
+    vb.cpus    = "1"
+    vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+  end
+
 end
