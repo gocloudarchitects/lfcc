@@ -3,7 +3,7 @@
 
 # MINIMUM REQUIREMENTS
 # CPU: non listed
-# RAM: 8GB
+# RAM: 8GB -- 12 configured
 # HDD: 40GB
 # Network: 2 NICs
 # (optional): additional HDD for Cinder volumes
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
   
   # Virtualbox-specific parameters
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = "8192"
+    vb.memory = "12288"
     vb.cpus    = "4"
     vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
   end

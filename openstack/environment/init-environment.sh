@@ -47,15 +47,14 @@ fi
 mkdir ~/images
 curl --fail -L -o ~/images/cirros-0.5.1-x86_64-disk.img https://github.com/cirros-dev/cirros/releases/download/0.5.1/cirros-0.5.1-x86_64-disk.img
 openstack image create --disk-format qcow2 --container-format bare --public --property os_type=linux --file ~/images/cirros-0.5.1-x86_64-disk.img cirros
-curl --fail -L -o ubuntu-focal-x86_64img https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img
-openstack image create --disk-format qcow2 --container-format bare --public --property os_type=linux --file ~/images/ubuntu-focal-x86_64.img
+curl --fail -L -o ~/images/focal-server-cloudimg-amd64.img   https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img  
+openstack image create --disk-format qcow2 --container-format bare --public --property os_type=linux --file ~/images/focal-server-cloudimg-amd64.img  ubuntu-focal
 
 # create flavors
 openstack flavor create --id 1 --ram 512 --disk 1 --vcpus 1 m1.tiny
-openstack flavor create --id 2 --ram 2048 --disk 20 --vcpus 1 m1.small
-openstack flavor create --id 3 --ram 4096 --disk 40 --vcpus 2 m1.medium
-openstack flavor create --id 4 --ram 8192 --disk 80 --vcpus 4 m1.large
-openstack flavor create --id 5 --ram 16384 --disk 160 --vcpus 8 m1.xlarge
+openstack flavor create --id 2 --ram 2048 --disk 10 --vcpus 1 m1.small
+openstack flavor create --id 3 --ram 4096 --disk 15 --vcpus 2 m1.medium
+openstack flavor create --id 4 --ram 8192 --disk 20 --vcpus 4 m1.large
 
 # create demo instance
 openstack server create --flavor m1.tiny --image cirros --network tenant-net --key-name default-keypair demo-server
