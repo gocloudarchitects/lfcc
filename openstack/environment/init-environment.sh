@@ -1,5 +1,13 @@
-# source openstack credentials
+# source venv and openstack credentials
+source ~/venv/kolla/bin/activate
 source /etc/kolla/admin-openrc.sh
+alias o=openstack
+
+# add sourcing to bashrc
+echo "### OPENSTACK ENVIRONMENT ###" >> ~/.bashrc
+echo "source ~/venv/kolla/bin/activate" >> ~/.bashrc
+echo "source /etc/kolla/admin-openrc.sh" >> ~/.bashrc
+echo "alias o=openstack" >> ~/.bashrc
 
 # get admin project id and default secgroup id
 ADMIN_PROJECT_ID=$(openstack project list | awk '/ admin / {print $2}')
@@ -27,18 +35,6 @@ openstack network create --external --provider-physical-network physnet1 --provi
 openstack subnet create --dhcp --allocation-pool start=192.168.6.100,end=192.168.6.199 --network provider-net --subnet-range 192.168.6.0/24 --gateway 192.168.6.1 provider-subnet
 openstack router set --external-gateway provider-net demo-router
 
-# configure bridge to access provider network
-sudo cat << EOF > /etc/netplan/60-provider.yaml
-network:
-  version: 2
-  renderer: networkd
-  bridges:
-    br-ex:
-      addresses:
-      - 192.168.6.1/24
-EOF
-sudo netplan apply
-
 # create keypair
 if [ ! -f ~/.ssh/id_rsa.pub ]; then
     ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
@@ -47,10 +43,12 @@ if [ -r ~/.ssh/id_rsa.pub ]; then
     openstack keypair create --public-key ~/.ssh/id_rsa.pub default-keypair
 fi
 
-# create glance image
+# create glance images
 mkdir ~/images
-curl --fail -L -o ~/images/cirros-0.5.1-x86_64-disk.img
-openstack image create --disk-format qcow2 --container-format bare --public --property os_type=cirros --file ~/images/cirros-0.5.1-x86_64-disk.img
+curl --fail -L -o ~/images/cirros-0.5.1-x86_64-disk.img https://github.com/cirros-dev/cirros/releases/download/0.5.1/cirros-0.5.1-x86_64-disk.img
+openstack image create --disk-format qcow2 --container-format bare --public --property os_type=linux --file ~/images/cirros-0.5.1-x86_64-disk.img cirros
+curl --fail -L -o ubuntu-focal-x86_64img https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-disk-kvm.img
+openstack image create --disk-format qcow2 --container-format bare --public --property os_type=linux --file ~/images/ubuntu-focal-x86_64.img
 
 # create flavors
 openstack flavor create --id 1 --ram 512 --disk 1 --vcpus 1 m1.tiny
@@ -58,7 +56,6 @@ openstack flavor create --id 2 --ram 2048 --disk 20 --vcpus 1 m1.small
 openstack flavor create --id 3 --ram 4096 --disk 40 --vcpus 2 m1.medium
 openstack flavor create --id 4 --ram 8192 --disk 80 --vcpus 4 m1.large
 openstack flavor create --id 5 --ram 16384 --disk 160 --vcpus 8 m1.xlarge
-
 
 # create demo instance
 openstack server create --flavor m1.tiny --image cirros --network tenant-net --key-name default-keypair demo-server
