@@ -1,16 +1,6 @@
 # This file for user variables and default overrides
 # Defaults are defined in variables.tf
 
-# MANDATORY
-
-# Set these based on your openstack installation
-# admin_project_id =
-# admin_security_group_id =
-
-
-
-#  OPTIONAL
-
 # Set this based on your access network
 #provider_network({
 #  cidr = "192.168.6.0/24"

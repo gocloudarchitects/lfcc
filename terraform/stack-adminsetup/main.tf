@@ -1,4 +1,8 @@
-# Define required providers
+#####################
+# PROVIDER CONFIG
+#####################
+
+
 terraform {
 required_version = ">= 0.14.0"
   required_providers {
@@ -20,9 +24,24 @@ provider "openstack" {
 }
 
 
+###################
+# DATA SOURCES
+###################
+
+data "openstack_identity_project_v3" "current_project" {
+  name = "admin"
+}
+
+data "openstack_networking_secgroup_v2" "default" {
+  name = "default"
+  tenant_id = data.openstack_identity_project_v3.current_project.id
+}
+
 #################
 # RESOURCES
 #################
+
+## ADMIN QUOTA
 
 # Set project networking quota
 resource "openstack_networking_quota_v2" "quota" {
@@ -35,7 +54,7 @@ resource "openstack_networking_quota_v2" "quota" {
   security_group_rule = -1
   subnet              = -1
   subnetpool          = -1
-  project_id = var.admin_project_id
+  project_id = data.openstack_identity_project_v3.current_project.id
 }
 
 # Set project storage quota
@@ -47,7 +66,7 @@ resource "openstack_blockstorage_quotaset_v3" "quota" {
   backups = -1
   backup_gigabytes = -1
   groups = -1
-  project_id = var.admin_project_id
+  project_id = data.openstack_identity_project_v3.current_project.id
 }
 
 # Set project compute quota
@@ -58,8 +77,10 @@ resource "openstack_compute_quotaset_v2" "quota" {
   instances            = -1
   server_groups        = -1
   server_group_members = -1
-  project_id = var.admin_project_id
+  project_id = data.openstack_identity_project_v3.current_project.id
 }
+
+## NETWORK RESOURCES
 
 # Add ping and SSH to admin security group
 resource "openstack_networking_secgroup_rule_v2" "rule_ssh" {
@@ -67,7 +88,7 @@ resource "openstack_networking_secgroup_rule_v2" "rule_ssh" {
   ethertype         = "IPv4"
   protocol          = "icmp"
   remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = var.admin_security_group_id
+  security_group_id = data.openstack_networking_secgroup_v2.default.id
 }
 
 resource "openstack_networking_secgroup_rule_v2" "rule_icmp" {
@@ -77,7 +98,7 @@ resource "openstack_networking_secgroup_rule_v2" "rule_icmp" {
   port_range_min    = 22
   port_range_max    = 22
   remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = var.admin_security_group_id
+  security_group_id = data.openstack_networking_secgroup_v2.default.id
 }
 
 # Create external network
@@ -127,6 +148,32 @@ resource "openstack_networking_router_interface_v2" "router_interface" {
   subnet_id = "${openstack_networking_subnet_v2.admin_subnet.id}"
 }
 
+## IMAGE
+
+resource "openstack_images_image_v2" "cirros_base" {
+  name = var.default_image.name
+  image_source_url = var.default_image.url
+  container_format = "bare"
+  disk_format = "qcow2"
+  visibility = "shared"
+  properties = {
+    version = var.default_image.version_tag
+  }
+}
+
+
+## Flavors
+
+resource "openstack_compute_flavor_v2" "flavor" {
+  count = length(var.flavors)
+  name  = var.flavors[count.index].name
+  ram   = var.flavors[count.index].ram
+  vcpus = var.flavors[count.index].vcpus
+  disk  = var.flavors[count.index].disk
+  is_public = true
+}
+
+
 ########################
 # OUTPUTS
 ########################
@@ -135,3 +182,5 @@ output "admin_router_external_ip" {
   description = "Gateway IP address for the admin router on the external network"
   value = openstack_networking_router_v2.admin_router.external_fixed_ip[0].ip_address
 }
+
+
