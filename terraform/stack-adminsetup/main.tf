@@ -30,6 +30,7 @@ resource "openstack_networking_quota_v2" "quota" {
   security_group_rule = -1
   subnet              = -1
   subnetpool          = -1
+  project_id = var.admin_project_id
 }
 
 # Set project storage quota
@@ -41,6 +42,7 @@ resource "openstack_blockstorage_quotaset_v3" "quota" {
   backups = -1
   backup_gigabytes = -1
   groups = -1
+  project_id = var.admin_project_id
 }
 
 # Set project compute quota
@@ -51,6 +53,7 @@ resource "openstack_compute_quotaset_v2" "quota" {
   instances            = -1
   server_groups        = -1
   server_group_members = -1
+  project_id = var.admin_project_id
 }
 
 # Add ping and SSH to admin security group
@@ -59,24 +62,24 @@ resource "openstack_networking_secgroup_rule_v2" "rule-ssh" {
   ethertype         = "IPv4"
   protocol          = "icmp"
   remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = "default"
+  security_group_id = var.admin_security_group_id
 }
 
-resource "openstack_networking_secgroup_rule_v2" "rule-ssh" {
+resource "openstack_networking_secgroup_rule_v2" "rule-icmp" {
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
   port_range_min    = 22
   port_range_max    = 22
   remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = "default"
+  security_group_id = var.admin_security_group_id
 }
-
 
 # Create external network
 resource "openstack_networking_network_v2" "external-net" {
   name           = "external-net"
-  admin_state_up = "true"
+  admin_state_up = true
+  external = true
   physical_network = "physnet1"
   network_type = "flat"
 }
