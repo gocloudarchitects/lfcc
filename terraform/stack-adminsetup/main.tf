@@ -131,7 +131,7 @@ resource "openstack_networking_router_v2" "admin_router" {
 
 # Create admin test network
 resource "openstack_networking_network_v2" "admin_net" {
-  name           = "admin_net"
+  name           = "admin-net"
   admin_state_up = "true"
 }
 
