@@ -19,6 +19,11 @@ provider "openstack" {
   region      = var.stack_endpoint.region
 }
 
+
+#################
+# RESOURCES
+#################
+
 # Set project networking quota
 resource "openstack_networking_quota_v2" "quota" {
   floatingip          = -1
@@ -57,7 +62,7 @@ resource "openstack_compute_quotaset_v2" "quota" {
 }
 
 # Add ping and SSH to admin security group
-resource "openstack_networking_secgroup_rule_v2" "rule-ssh" {
+resource "openstack_networking_secgroup_rule_v2" "rule_ssh" {
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "icmp"
@@ -65,7 +70,7 @@ resource "openstack_networking_secgroup_rule_v2" "rule-ssh" {
   security_group_id = var.admin_security_group_id
 }
 
-resource "openstack_networking_secgroup_rule_v2" "rule-icmp" {
+resource "openstack_networking_secgroup_rule_v2" "rule_icmp" {
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
@@ -76,42 +81,57 @@ resource "openstack_networking_secgroup_rule_v2" "rule-icmp" {
 }
 
 # Create external network
-resource "openstack_networking_network_v2" "external-net" {
+resource "openstack_networking_network_v2" "external_net" {
   name           = "external-net"
   admin_state_up = true
   external = true
-  physical_network = "physnet1"
-  network_type = "flat"
+  segments{
+    physical_network = "physnet1"
+    network_type = "flat"
+  }
 }
 
-resource "openstack_networking_subnet_v2" "external-subnet" {
+resource "openstack_networking_subnet_v2" "external_subnet" {
   name       = "external-subnet"
-  network_id = "${openstack_networking_network_v2.external-net.id}"
-  cidr       = var.provider_cidr
+  network_id = "${openstack_networking_network_v2.external_net.id}"
+  cidr       = var.provider_network.cidr
   ip_version = 4
+  allocation_pool{
+    start = var.provider_network.pool_start
+    end = var.provider_network.pool_end
+  }
 }
 
 # Create admin router
-resource "openstack_networking_router_v2" "admin-router" {
+resource "openstack_networking_router_v2" "admin_router" {
   name                = "admin-router"
-  external_network_id = "${openstack_networking_network_v2.external-net.id}"
+  external_network_id = "${openstack_networking_network_v2.external_net.id}"
 }
 
 # Create admin test network
-resource "openstack_networking_network_v2" "admin-net" {
-  name           = "admin-net"
+resource "openstack_networking_network_v2" "admin_net" {
+  name           = "admin_net"
   admin_state_up = "true"
 }
 
-resource "openstack_networking_subnet_v2" "admin-subnet" {
+resource "openstack_networking_subnet_v2" "admin_subnet" {
   name       = "admin-subnet"
-  network_id = "${openstack_networking_network_v2.admin-net.id}"
-  cidr       = "172.16.0.0/24"
+  network_id = "${openstack_networking_network_v2.admin_net.id}"
+  cidr       = var.admin_cidr
   ip_version = 4
 }
 
 # Add subnet to router
-resource "openstack_networking_router_interface_v2" "router_interface_1" {
-  router_id = "${openstack_networking_router_v2.admin-router.id}"
-  subnet_id = "${openstack_networking_subnet_v2.admin-subnet.id}"
+resource "openstack_networking_router_interface_v2" "router_interface" {
+  router_id = "${openstack_networking_router_v2.admin_router.id}"
+  subnet_id = "${openstack_networking_subnet_v2.admin_subnet.id}"
+}
+
+########################
+# OUTPUTS
+########################
+
+output "admin_router_external_ip" {
+  description = "Gateway IP address for the admin router on the external network"
+  value = openstack_networking_router_v2.admin_router.external_fixed_ip[0].ip_address
 }
