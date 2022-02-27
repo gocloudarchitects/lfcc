@@ -103,7 +103,7 @@ resource "openstack_networking_network_v2" "admin-net" {
 resource "openstack_networking_subnet_v2" "admin-subnet" {
   name       = "admin-subnet"
   network_id = "${openstack_networking_network_v2.admin-net.id}"
-  cidr       = 172.16.0.0/24
+  cidr       = "172.16.0.0/24"
   ip_version = 4
 }
 
