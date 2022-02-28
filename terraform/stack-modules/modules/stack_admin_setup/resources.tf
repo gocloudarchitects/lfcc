@@ -1,49 +1,3 @@
-#####################
-# PROVIDER CONFIG
-#####################
-
-
-terraform {
-required_version = ">= 0.14.0"
-  required_providers {
-    openstack = {
-      source  = "terraform-provider-openstack/openstack"
-      version = "~> 1.35.0"
-    }
-  }
-}
-
-# Configure the OpenStack Provider
-# Credentials from course lab, please provide your own if different
-provider "openstack" {
-  user_name   = var.stack_credentials.user_name
-  tenant_name = var.stack_credentials.tenant_name
-  password    = var.stack_credentials.password
-  auth_url    = var.stack_endpoint.auth_url
-  region      = var.stack_endpoint.region
-}
-
-
-###################
-# DATA SOURCES
-###################
-
-data "openstack_identity_project_v3" "admin" {
-  name = "admin"
-}
-
-data "openstack_networking_secgroup_v2" "default" {
-  name = "default"
-  tenant_id = data.openstack_identity_project_v3.admin.id
-}
-
-#################
-# RESOURCES
-#################
-
-## ADMIN QUOTA
-
-# Set project networking quota
 resource "openstack_networking_quota_v2" "admin" {
   floatingip          = -1
   network             = -1
@@ -54,7 +8,7 @@ resource "openstack_networking_quota_v2" "admin" {
   security_group_rule = -1
   subnet              = -1
   subnetpool          = -1
-  project_id = data.openstack_identity_project_v3.admin.id
+  project_id = var.admin_project_id
 }
 
 # Set project storage quota
@@ -66,7 +20,7 @@ resource "openstack_blockstorage_quotaset_v3" "admin" {
   backups = -1
   backup_gigabytes = -1
   groups = -1
-  project_id = data.openstack_identity_project_v3.admin.id
+  project_id = var.admin_project_id
 }
 
 # Set project compute quota
@@ -77,7 +31,7 @@ resource "openstack_compute_quotaset_v2" "admin" {
   instances            = -1
   server_groups        = -1
   server_group_members = -1
-  project_id = data.openstack_identity_project_v3.admin.id
+  project_id = var.admin_project_id
 }
 
 ## NETWORK RESOURCES
@@ -88,7 +42,7 @@ resource "openstack_networking_secgroup_rule_v2" "ssh" {
   ethertype         = "IPv4"
   protocol          = "icmp"
   remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = data.openstack_networking_secgroup_v2.default.id
+  security_group_id = var.admin_default_secgroup_id
 }
 
 resource "openstack_networking_secgroup_rule_v2" "icmp" {
@@ -98,7 +52,7 @@ resource "openstack_networking_secgroup_rule_v2" "icmp" {
   port_range_min    = 22
   port_range_max    = 22
   remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = data.openstack_networking_secgroup_v2.default.id
+  security_group_id = var.admin_default_secgroup_id
 }
 
 # Create external network
@@ -115,11 +69,11 @@ resource "openstack_networking_network_v2" "external" {
 resource "openstack_networking_subnet_v2" "external" {
   name       = "external-subnet"
   network_id = resource.openstack_networking_network_v2.external.id
-  cidr       = var.provider_network.cidr
+  cidr       = var.provider_network_cidr
   ip_version = 4
   allocation_pool{
-    start = var.provider_network.pool_start
-    end = var.provider_network.pool_end
+    start = var.provider_network_pool_start
+    end = var.provider_network_pool_end
   }
 }
 
@@ -138,7 +92,7 @@ resource "openstack_networking_network_v2" "admin" {
 resource "openstack_networking_subnet_v2" "admin" {
   name       = "admin-subnet"
   network_id = resource.openstack_networking_network_v2.admin.id
-  cidr       = var.admin_cidr
+  cidr       = var.admin_network_cidr
   ip_version = 4
 }
 
@@ -151,13 +105,13 @@ resource "openstack_networking_router_interface_v2" "admin_gateway" {
 ## IMAGE
 
 resource "openstack_images_image_v2" "cirros" {
-  name = var.default_image.name
-  image_source_url = var.default_image.url
+  name = var.default_image_name
+  image_source_url = var.default_image_url
   container_format = "bare"
   disk_format = "qcow2"
   visibility = "shared"
   properties = {
-    version = var.default_image.version_tag
+    version = var.default_image_version_tag
   }
 }
 
@@ -165,22 +119,10 @@ resource "openstack_images_image_v2" "cirros" {
 ## Flavors
 
 resource "openstack_compute_flavor_v2" "public" {
-  count = length(var.flavors)
-  name  = var.flavors[count.index].name
-  ram   = var.flavors[count.index].ram
-  vcpus = var.flavors[count.index].vcpus
-  disk  = var.flavors[count.index].disk
+  count = length(var.public_flavors)
+  name  = var.public_flavors[count.index].name
+  ram   = var.public_flavors[count.index].ram
+  vcpus = var.public_flavors[count.index].vcpus
+  disk  = var.public_flavors[count.index].disk
   is_public = true
 }
-
-
-########################
-# OUTPUTS
-########################
-
-output "admin_router_external_ip" {
-  description = "Gateway IP address for the admin router on the external network"
-  value = openstack_networking_router_v2.admin.external_fixed_ip[0].ip_address
-}
-
-
