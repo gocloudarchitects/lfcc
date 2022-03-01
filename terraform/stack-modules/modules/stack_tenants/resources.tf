@@ -3,7 +3,7 @@ resource "openstack_identity_project_v3" "projects" {
   name = each.key
 }
 
-resource "openstack_identity_user_v3" "tenants" {
+resource "openstack_identity_user_v3" "users" {
   for_each = resource.openstack_identity_project_v3.projects
   name = each.value.name
   default_project_id = each.value.id
@@ -12,10 +12,38 @@ resource "openstack_identity_user_v3" "tenants" {
 }
 
 resource "openstack_identity_role_assignment_v3" "member" {
-  for_each = resource.openstack_identity_user_v3.tenants
+  for_each = resource.openstack_identity_user_v3.users
   user_id    = each.value.id
   project_id = each.value.default_project_id
   role_id    = var.tenant_role_id
+}
+
+data "openstack_networking_secgroup_v2" "default" {
+  for_each = resource.openstack_identity_project_v3.projects
+  tenant_id = each.value.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "ssh" {
+  for_each = resource.openstack_identity_project_v3.projects
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "icmp"
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = data.openstack_networking_secgroup_v2.default[each.key].id
+  tenant_id = each.value.id
+}
+
+
+resource "openstack_networking_secgroup_rule_v2" "icmp" {
+  for_each = resource.openstack_identity_project_v3.projects
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = data.openstack_networking_secgroup_v2.default[each.key].id
+  tenant_id = each.value.id
 }
 
 # Set project networking quota
