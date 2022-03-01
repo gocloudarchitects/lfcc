@@ -1,5 +1,3 @@
-
-
 variable "tenants" {
   description = "list of tenants"
   type = set(string)

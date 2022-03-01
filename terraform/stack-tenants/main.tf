@@ -82,6 +82,7 @@ resource "openstack_compute_quotaset_v2" "tenant" {
 resource "openstack_networking_router_v2" "tenant" {
   for_each = resource.openstack_identity_project_v3.projects
   tenant_id = each.value.id 
+  name = "${each.value.id}-router"
   external_network_id = data.openstack_networking_network_v2.external.id
 }
 

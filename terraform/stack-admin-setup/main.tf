@@ -155,7 +155,7 @@ resource "openstack_images_image_v2" "cirros" {
   image_source_url = var.default_image.url
   container_format = "bare"
   disk_format = "qcow2"
-  visibility = "shared"
+  visibility = "public"
   properties = {
     version = var.default_image.version_tag
   }
