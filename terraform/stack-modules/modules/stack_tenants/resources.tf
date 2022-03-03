@@ -33,7 +33,6 @@ resource "openstack_networking_secgroup_rule_v2" "ssh" {
   tenant_id = each.value.id
 }
 
-
 resource "openstack_networking_secgroup_rule_v2" "icmp" {
   for_each = resource.openstack_identity_project_v3.projects
   direction         = "ingress"
