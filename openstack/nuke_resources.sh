@@ -5,7 +5,7 @@ if [ "$1" != "--run" ]; then
   echo "This is a dry run, no changes will be made"
   for i in "${resources[@]}"; do
     echo "### $i ###"
-    openstack $i list
+    openstack $i list 2>/dev/null
   done
   echo "To delete these resources, run this script with the '--run' flag."
 elif [ "$1" == "--run" ]; then
