@@ -2,10 +2,6 @@
 
 ## Preparing the environment
 
-One of the benefits of running virtual machines is that you can run many different operating systems on a single hardware system.  
-
-### Exercises
-
 1. Go to app.vagrantup.com and search for major distributions such as Debian, CentOS Stream, and openSUSE Tumbleweed.  Create a new directory in your vagrant folder and create a Vagrantfile by using the `vagrant init` command for the desired distro. Then run (`vagrant up`) and connect to the VM (`vagrant ssh`).  If you like, take a look around and run some commands.  When you're finished, run `vagrant halt` to shut down the VM.
 
 2. Review the [Vagrant documentation](https://www.vagrantup.com/docs/) and make some changes to your VM.  For example:
@@ -61,89 +57,105 @@ Most user and permissions management must be done as root.  Run the following co
 
 1. Create groups and users.  I show the full output of the creation command for alice.
 
-	```bash
-	root@lab-vm:~# groupadd product
-	root@lab-vm:~# groupadd finance
-	root@lab-vm:~# adduser alice
-	Adding user `alice' ...
-	Adding new group `alice' (1004) ...
-	Adding new user `alice' (1002) with group `alice' ...
-	Creating home directory `/home/alice' ...
-	Copying files from `/etc/skel' ...
-	New password: 
-	Retype new password: 
-	passwd: password updated successfully
-	Changing the user information for alice
-	Enter the new value, or press ENTER for the default
-		Full Name []: 
-		Room Number []: 
-		Work Phone []: 
-		Home Phone []: 
-		Other []: 
-	Is the information correct? [Y/n] y
-	root@lab-vm:~# usermod -aG finance,product alice
-	root@lab-vm:~# adduser bob
-	root@lab-vm:~# usermod -aG product bob
-	root@lab-vm:~# adduser charlie
-	root@lab-vm:~# usermod -aG finance charlie
-	```
+    ```bash
+    root@lab-vm:~# groupadd product
+    root@lab-vm:~# groupadd finance
+    root@lab-vm:~# adduser alice
+    Adding user `alice' ...
+    Adding new group `alice' (1004) ...
+    Adding new user `alice' (1002) with group `alice' ...
+    Creating home directory `/home/alice' ...
+    Copying files from `/etc/skel' ...
+    New password: 
+    Retype new password: 
+    passwd: password updated successfully
+    Changing the user information for alice
+    Enter the new value, or press ENTER for the default
+    	Full Name []: 
+    	Room Number []: 
+    	Work Phone []: 
+    	Home Phone []: 
+    	Other []: 
+    Is the information correct? [Y/n] y
+    root@lab-vm:~# usermod -aG finance,product alice
+    root@lab-vm:~# adduser bob
+    root@lab-vm:~# usermod -aG product bob
+    root@lab-vm:~# adduser charlie
+    root@lab-vm:~# usermod -aG finance charlie
+    ```
 
 2. Create directories and apply ownership.
 
 
-	```bash
-	root@lab-vm:~# mkdir /opt/{finance,product}
-	root@lab-vm:~# cd /opt/
-	root@lab-vm:/opt# ls
-	finance  product
-	root@lab-vm:/opt# chown :finance finance
-	root@lab-vm:/opt# chown :product product
-	root@lab-vm:/opt# ls -l | egrep 'finance|product'
-	drwxr-xr-x 2 root finance 4096 Mar 20 13:14 finance
-	drwxr-xr-x 2 root product 4096 Mar 20 13:14 product
-	```
+    ```bash
+    root@lab-vm:~# mkdir /opt/{finance,product}
+    root@lab-vm:~# cd /opt/
+    root@lab-vm:/opt# ls
+    finance  product
+    root@lab-vm:/opt# chown :finance finance
+    root@lab-vm:/opt# chown :product product
+    root@lab-vm:/opt# ls -l | egrep 'finance|product'
+    drwxr-xr-x 2 root finance 4096 Mar 20 13:14 finance
+    drwxr-xr-x 2 root product 4096 Mar 20 13:14 product
+    ```
 
 3. Apply permissions to each directory
 
 
-	```sh
-	root@lab-vm:/opt# chmod 2775 product
-	root@lab-vm:/opt# chmod 5770 finance
-	```
+    ```sh
+    root@lab-vm:/opt# chmod 2775 product
+    root@lab-vm:/opt# chmod 5770 finance
+    ```
 
-	The requirements for the product directory are:
-	- Full read and write permissions for the group, which is accomplished setting full permissions (read, write, execute) for user and group:
-	  - numeric: -77- mask
-	  - symbolic: ug+rwx
-	- Read only access to non-members, which is accomplished by setting read and execute permission bits for `other`:
-	  - numeric: ---5 mask
-	  - symbolic: o+rx
-	- Files are editable by members of the group, which is accomplished with the setgid bit:
-	  - numeric: 2--- mask
-	  - symbolic: g+s
+    The requirements for the product directory are:
+    - Full read and write permissions for the group, which is accomplished setting full permissions (read, write, execute) for user and group:
+      - numeric: -77- mask
+      - symbolic: ug+rwx
+    - Read only access to non-members, which is accomplished by setting read and execute permission bits for `other`:
+      - numeric: ---5 mask
+      - symbolic: o+rx
+    - Files are editable by members of the group, which is accomplished with the setgid bit:
+      - numeric: 2--- mask
+      - symbolic: g+s
 
-	We add all the masks together to get the command above, or we could also run:
+    We add all the masks together to get the command above, or we could also run:
 
-	```sh
-	root@lab-vm:/opt# chmod ug+rwx,o+rx,g+s product
-	```
+    ```sh
+    root@lab-vm:/opt# chmod ug+rwx,o+rx,g+s product
+    ```
 
-	The requirements for the finance directory are:
-	- Full read and write permissions for the group, give read, write, execute to user and group.
-	  - numeric: -77- mask
-	  - symbolic: ug+rwx
-	- No access for non-members, which is accomplished by removing all permission from `other`:
-	  - numeric: ---0 mask
-	  - symbolic: o-rwx (note the minus instead of the plus)
-	- New files are readable and writable by other group members. In this case we need to set the setgid bit (2) and the sticky bit (1), which in numeric system equals 3:
-	  - numeric: 3--- mask
-	  - symbolic: g+s,o+t
+    The requirements for the finance directory are:
+    - Full read and write permissions for the group, give read, write, execute to user and group.
+      - numeric: -77- mask
+      - symbolic: ug+rwx
+    - No access for non-members, which is accomplished by removing all permission from `other`:
+      - numeric: ---0 mask
+      - symbolic: o-rwx (note the minus instead of the plus)
+    - New files are readable and writable by other group members. In this case we need to set the setgid bit (2) and the sticky bit (1), which in numeric system equals 3:
+      - numeric: 3--- mask
+      - symbolic: g+s,o+t
 
-	We add all the masks together to get 3775, or can also run the following:
+    We add all the masks together to get 3775, or can also run the following:
 
-	```sh
-	root@lab-vm:/opt# chmod ug+rwx,o-rwx,g+s,o+t finance
-	```
+    ```sh
+    root@lab-vm:/opt# chmod ug+rwx,o-rwx,g+s,o+t finance
+    ```
 
 ### Linux File Hierarchy
+
+1. Review the contents of some packages using `dpkg -L <package>` and consider why certain files were placed where.
+
+   Interesting packages to consider:
+   - openssh-client
+   - openssh-server
+   - sudo
+   - vim
+
+2. Review the /proc and /sys filesystems and try to get a sense of what information you can find in each location.
+
+   - check the man pages with `man procfs` and `man sysfs`
+   - use `cat` to view the contents of nodes
+   - review the README file at `/sys/kernel/tracing/README`
+   - investigate processes by looking at the files until its pid directory at `/proc/<pid>`
+     - you can discover the pid by running `ps aux | grep <program>` or `pidof <program>` (try `pidof sshd`)
 
