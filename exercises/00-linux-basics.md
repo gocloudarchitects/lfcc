@@ -141,6 +141,21 @@ Most user and permissions management must be done as root.  Run the following co
     root@lab-vm:/opt# chmod ug+rwx,o-rwx,g+s,o+t finance
     ```
 
+### Package Management
+
+1. Explore the dpkg utility.  dpkg can be thought of as the manual tool for the apt package management suite.  Reviewing the help and man page can give you a better idea of how Ubuntu's package management works.
+
+2. Look in the `/etc` folder and use `dpkg -S` to find packages that own files. Note that it is a string search:
+   - Try `dpkg -S /etc/shadow` vs `dpkg -S shadow`
+   - Try `dpkg -S /etc`
+   - Try `dpkg -S /boot`
+
+3. Use `dpkg -L` to get a list of files installed by a package.  Run `apt list --installed` and select some packages to review.
+
+4. If you're interested in how packages are built, review the [Ubuntu Packaging Guide](https://packaging.ubuntu.com/html/)
+
+5. Red Hat uses another package format and build system. If interested, review their RHEL8 guide on [Packaging and Distributing Software](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/packaging_and_distributing_software/index)
+
 ### Linux File Hierarchy
 
 1. Review the contents of some packages using `dpkg -L <package>` and consider why certain files were placed where.
@@ -158,4 +173,3 @@ Most user and permissions management must be done as root.  Run the following co
    - review the README file at `/sys/kernel/tracing/README`
    - investigate processes by looking at the files until its pid directory at `/proc/<pid>`
      - you can discover the pid by running `ps aux | grep <program>` or `pidof <program>` (try `pidof sshd`)
-

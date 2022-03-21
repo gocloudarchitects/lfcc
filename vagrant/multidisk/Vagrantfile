@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+  config.vm.provision "shell",
+    inline: "hostnamectl set-hostname multidisk-lab"
+
+  config.vm.disk :disk, name: "disk1", size: "5GB"
+  config.vm.disk :disk, name: "disk2", size: "5GB"
+  config.vm.disk :disk, name: "disk3", size: "5GB"
+
+  # Virtualbox-specific parameters
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "4096"
+    vb.cpus    = "2"
+    # enable nested virtualization
+    vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+  end
+end
