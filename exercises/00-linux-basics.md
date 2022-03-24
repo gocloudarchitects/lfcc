@@ -38,20 +38,61 @@ Note that there are different ways of accomplishing 3b.  The documentation has a
 
   Why does the third example fail? Review example-1 and example-2 files with `tar tf /tmp/<filename>`.  Can you explain why the archives turned out so differently?
 
+
 ## Linux Text Editing
 
 Run `vimtutor` and do the exercises at least through the Lesson 4 Summary.
 
+
 ## User management and file permissions
 
 Try setting up users and a shared group with the following parameters:
-1. alice and bob are members of the `product` group
-2. The `/opt/product` directory should be writable by members of the `product` group.  Any product group member can read or delete any file in the `/opt/product` directory. Non-members should have read-only access.
-3. alice and charlie are members of the `finance` group
-4. The `/opt/finance` should be writable by members of the `finance` group. Files created by one user should be editable by other users, but only deletable by the file owner.
-5. Non-members should not be able to read or write to the finance directory.
+- alice and bob are members of the `product` group
+- The `/opt/product` directory should be writable by members of the `product` group.  Any product group member can read or delete any file in the `/opt/product` directory. Non-members should have read-only access.
+- alice and charlie are members of the `finance` group
+- The `/opt/finance` should be writable by members of the `finance` group. Files created by one user should be editable by other users, but only deletable by the file owner.
+- Non-members should not be able to read or write to the finance directory.
 
-ANSWER:
+
+## Package Management
+
+1. Explore the dpkg utility.  dpkg can be thought of as the manual tool for the apt package management suite.  Reviewing the help and man page can give you a better idea of how Ubuntu's package management works.
+
+2. Look in the `/etc` folder and use `dpkg -S` to find packages that own files. Note that it is a string search:
+   - Try `dpkg -S /etc/shadow` vs `dpkg -S shadow`
+   - Try `dpkg -S /etc`
+   - Try `dpkg -S /boot`
+
+3. Use `dpkg -L` to get a list of files installed by a package.  Run `apt list --installed` and select some packages to review.
+
+4. If you're interested in how packages are built, review the [Ubuntu Packaging Guide](https://packaging.ubuntu.com/html/)
+
+5. Red Hat uses another package format and build system. If interested, review their RHEL8 guide on [Packaging and Distributing Software](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/packaging_and_distributing_software/index)
+
+6. Many packages use [Semantic Versioning](https://semver.org/), which uses an X.Y.Z format for how particular changes should be reflected in the package version. Read at least the summary, and if interested, the entire definition. Knowledge of how versioning works can be very useful in a career in IT.
+
+
+## Linux File Hierarchy
+
+1. Review the contents of some packages using `dpkg -L <package>` and consider why certain files were placed where.
+
+   Interesting packages to consider:
+   - openssh-client
+   - openssh-server
+   - sudo
+   - vim
+
+2. Review the /proc and /sys filesystems and try to get a sense of what information you can find in each location.
+
+   - check the man pages with `man procfs` and `man sysfs`
+   - use `cat` to view the contents of nodes
+   - review the README file at `/sys/kernel/tracing/README`
+   - investigate processes by looking at the files until its pid directory at `/proc/<pid>`
+     - you can discover the pid by running `ps aux | grep <program>` or `pidof <program>` (try `pidof sshd`)
+
+# Answers
+
+## User management and file permissions
 
 Most user and permissions management must be done as root.  Run the following commands with sudo, or enter a root shell by running `sudo -i`
 
@@ -71,11 +112,11 @@ Most user and permissions management must be done as root.  Run the following co
     passwd: password updated successfully
     Changing the user information for alice
     Enter the new value, or press ENTER for the default
-    	Full Name []: 
-    	Room Number []: 
-    	Work Phone []: 
-    	Home Phone []: 
-    	Other []: 
+      Full Name []: 
+      Room Number []: 
+      Work Phone []: 
+      Home Phone []: 
+      Other []: 
     Is the information correct? [Y/n] y
     root@lab-vm:~# usermod -aG finance,product alice
     root@lab-vm:~# adduser bob
@@ -140,36 +181,3 @@ Most user and permissions management must be done as root.  Run the following co
     ```sh
     root@lab-vm:/opt# chmod ug+rwx,o-rwx,g+s,o+t finance
     ```
-
-### Package Management
-
-1. Explore the dpkg utility.  dpkg can be thought of as the manual tool for the apt package management suite.  Reviewing the help and man page can give you a better idea of how Ubuntu's package management works.
-
-2. Look in the `/etc` folder and use `dpkg -S` to find packages that own files. Note that it is a string search:
-   - Try `dpkg -S /etc/shadow` vs `dpkg -S shadow`
-   - Try `dpkg -S /etc`
-   - Try `dpkg -S /boot`
-
-3. Use `dpkg -L` to get a list of files installed by a package.  Run `apt list --installed` and select some packages to review.
-
-4. If you're interested in how packages are built, review the [Ubuntu Packaging Guide](https://packaging.ubuntu.com/html/)
-
-5. Red Hat uses another package format and build system. If interested, review their RHEL8 guide on [Packaging and Distributing Software](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/packaging_and_distributing_software/index)
-
-### Linux File Hierarchy
-
-1. Review the contents of some packages using `dpkg -L <package>` and consider why certain files were placed where.
-
-   Interesting packages to consider:
-   - openssh-client
-   - openssh-server
-   - sudo
-   - vim
-
-2. Review the /proc and /sys filesystems and try to get a sense of what information you can find in each location.
-
-   - check the man pages with `man procfs` and `man sysfs`
-   - use `cat` to view the contents of nodes
-   - review the README file at `/sys/kernel/tracing/README`
-   - investigate processes by looking at the files until its pid directory at `/proc/<pid>`
-     - you can discover the pid by running `ps aux | grep <program>` or `pidof <program>` (try `pidof sshd`)

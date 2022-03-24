@@ -63,7 +63,9 @@
 
 # ANSWERS:
 
-## Partitions and Filesystems - Exercise 2
+## Partitions and Filesystems
+
+### Exercise 2
 
 1. Partition the disk:
 
@@ -164,7 +166,7 @@
     vagrant@multidisk-lab:~$ sudo mv VBoxGuestAdditions-6.1.32 /opt/
     ```
 
-## Partitions and Filesystems - Exercise 3
+### Exercise 3
 
 Use `man fstab` and `man mount` to determine the solution, or look at online documentation.
 
@@ -175,7 +177,7 @@ Here are the entries I wrote.
 /dev/sdc2 /opt xfs nofail 0 0
 ```
 
-## Partitions and Filesystems - Exercise 4
+### Exercise 4
 
 1. Create the Physical Volumes
 
@@ -207,7 +209,7 @@ Here are the entries I wrote.
     root@multidisk-lab:~# mkfs.xfs /dev/mapper/labvg-var--lv 
     ```
 
-## Partitions and Filesystems - Exercise 5
+### Exercise 5
 
 There are different ways you can accomplish this, but you need to put the system in a state that it's not logging so that you can move the files.
 
