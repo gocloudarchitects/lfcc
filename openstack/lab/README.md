@@ -82,6 +82,10 @@ the required specification.
   - 1 public (bridged) NIC connecting the hypervisor API bridge
   - 1 dummy NIC, not connected to the hv
 
+Note that you may need to manually add the hard disk unless you have enabled
+the `VAGRANT_EXPERIMENTAL="disks"` environment variable. Please see the README
+file at `vagrant/multidisk/README.md` in this repository for details.
+
 ## Initialize the Lab VM
 
 This covers the preparation of the Lab VM, and is where the Kolla-Ansible
