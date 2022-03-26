@@ -4,8 +4,7 @@
 Vagrant.configure("2") do |config|
   # main VM definition
   config.vm.box = "generic/centos8"
-  config.vm.provision "shell",
-    inline: "hostnamectl set-hostname centos-vm"
+  config.vm.hostname = "centos"
 
   # Virtualbox-specific parameters
   config.vm.provider "virtualbox" do |vb|
