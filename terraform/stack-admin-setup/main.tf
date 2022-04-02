@@ -8,7 +8,7 @@ required_version = ">= 0.14.0"
   required_providers {
     openstack = {
       source  = "terraform-provider-openstack/openstack"
-      version = "~> 1.35.0"
+      version = "~> 1.47.0"
     }
   }
 }
@@ -127,6 +127,9 @@ resource "openstack_networking_subnet_v2" "external" {
 resource "openstack_networking_router_v2" "admin" {
   name                = "admin-router"
   external_network_id = resource.openstack_networking_network_v2.external.id
+  external_fixed_ip {
+    subnet_id = resource.openstack_networking_subnet_v2.external.id
+  }
 }
 
 # Create admin test network
@@ -182,5 +185,3 @@ output "admin_router_external_ip" {
   description = "Gateway IP address for the admin router on the external network"
   value = openstack_networking_router_v2.admin.external_fixed_ip[0].ip_address
 }
-
-
